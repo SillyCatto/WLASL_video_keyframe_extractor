@@ -1,5 +1,4 @@
 ## WLASL Video Keyframe Extractor
----
 
 > [!NOTE]
 > This tool is currently experimental and may not be accurate in all cases. Adjust the parameters accordingly for better results
@@ -135,5 +134,22 @@ Done.
 
 <br>
 
-Keyframes:
+Selected keyframes:
 ![extracted keyframe for 'yes'](assets/yes_64280_keyframes.png)
+
+<br>
+
+More examples:
+- Running script on ASL video for the word "brother":
+`uv run .\asl_keyframe_extractor.py dataset\raw_video_data\brother\brother_65262.mp4 --output-dir .\out\ --min-frame 4 --max-frame 6 --hold-threshold 0.08`
+
+The selected keyframes are:
+![alt text](assets/brother_65262_keyframes.png)
+
+<br>
+
+- For the word "man":
+`uv run .\asl_keyframe_extractor.py dataset\raw_video_data\man\man_66098.mp4 --output-dir .\out\ --min-frame 4 --max-frame 6 --hold-threshold 0.08`
+
+The selected keyframes are:
+![alt text](assets/man_66098_keyframes.png)

@@ -23,7 +23,9 @@ uv run asl_keyframe_extractor.py path/to/sign.mp4
 
 # FULL USAGE WITH ALL ARGS
 uv run asl_keyframe_extractor.py path/to/sign.mp4 \
-  --output-dir    ./out \       # Where to save the stitched PNG. Default: current dir
+  --output-dir    ./out \       # Where to save the output images. Default: current dir
+  -i \                          # Save each keyframe as an individual image (frame_0.png, ...)
+  -s \                          # Save stitched keyframe strip image
   --min-frames    8 \           # Minimum keyframes to extract. Default: 8
   --max-frames    15 \          # Maximum keyframes to extract. Default: 15
   --thumb-height  256 \         # Height (px) of each thumbnail in output image. Default: 256
@@ -67,9 +69,10 @@ done
 
 # OUTPUTS:
 # 1. Console table — frame indices, timestamps, T score and H score per keyframe
-# 2. PNG image     — stitched side-by-side keyframe strip saved to --output-dir
-#                    filename pattern: {video_stem}_keyframes.png
-#                    e.g.  out/go_keyframes.png
+# 2. Individual PNGs (if -i used) — separate frame images saved to --output-dir (frame_0.png, frame_1.png, ...)
+# 3. Stitched image (if -s used)  — stitched side-by-side keyframe strip saved to --output-dir
+#                                   filename pattern: {video_stem}_keyframes.png
+#                                   e.g.  out/go_keyframes.png
 ```
 
 <br>

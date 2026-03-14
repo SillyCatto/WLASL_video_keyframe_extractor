@@ -504,6 +504,27 @@ def select_keyframes(
 
 
 # ─────────────────────────────────────────────
+# Visualization — Individual Keyframe Images
+# ─────────────────────────────────────────────
+
+def save_individual_keyframes(
+    frames:    list[np.ndarray],
+    indices:   list[int],
+    output_dir: str,
+) -> None:
+    """
+    Saves each selected keyframe as an individual image file.
+    Files are named frame_0.png, frame_1.png, … in selection order.
+    """
+    for rank, idx in enumerate(indices):
+        bgr = frames[idx]
+        out_path = os.path.join(output_dir, f"frame_{rank}.png")
+        cv2.imwrite(out_path, bgr)
+
+    print(f"[output]  {len(indices)} individual keyframe images → {output_dir}")
+
+
+# ─────────────────────────────────────────────
 # Visualization — Stitched Keyframe Strip
 # ─────────────────────────────────────────────
 
@@ -669,6 +690,8 @@ def run_pipeline(
     video_path: str,
     output_dir: str = ".",
     config: Optional[PipelineConfig] = None,
+    save_individual: bool = False,
+    save_stitched: bool = False,
 ) -> dict:
     """
     Full ASL keyframe extraction pipeline.
@@ -730,17 +753,21 @@ def run_pipeline(
 
     keyframe_images = [frames[i] for i in keyframe_indices]
 
-    draw_keyframe_strip(
-        frames, keyframe_indices, fps,
-        fused_transition, fused_hold,
-        output_image_path, config,
-    )
+    if save_individual:
+        save_individual_keyframes(frames, keyframe_indices, output_dir)
+
+    if save_stitched:
+        draw_keyframe_strip(
+            frames, keyframe_indices, fps,
+            fused_transition, fused_hold,
+            output_image_path, config,
+        )
 
     return {
         "keyframe_indices":  keyframe_indices,
         "keyframe_times":    [round(i / fps, 3) for i in keyframe_indices],
         "keyframe_images":   keyframe_images,
-        "output_image_path": output_image_path,
+        "output_image_path": output_image_path if save_stitched else None,
     }
 
 
@@ -755,6 +782,10 @@ def parse_args():
     )
     p.add_argument("video",                      help="Path to input ASL video")
     p.add_argument("--output-dir",  default=".", help="Output directory for PNG")
+    p.add_argument("-i", "--individual", action="store_true",
+                   help="Save each keyframe as an individual image (frame_0.png, frame_1.png, …)")
+    p.add_argument("-s", "--stitched",   action="store_true",
+                   help="Save stitched keyframe strip image")
     p.add_argument("--min-frames",  type=int,   default=8,    help="Minimum keyframes")
     p.add_argument("--max-frames",  type=int,   default=15,   help="Maximum keyframes")
     p.add_argument("--thumb-height",type=int,   default=256,  help="Thumbnail height (px)")
@@ -783,9 +814,13 @@ if __name__ == "__main__":
         video_path=args.video,
         output_dir=args.output_dir,
         config=cfg,
+        save_individual=args.individual,
+        save_stitched=args.stitched,
     )
 
     print("Done.")
     print(f"  Keyframe indices : {[int(i) for i in result['keyframe_indices']]}")
     print(f"  Timestamps (s)   : {[float(t) for t in result['keyframe_times']]}")
-    print(f"  Output image     : {result['output_image_path']}")
+    if result['output_image_path']:
+        print(f"  Output image     : {result['output_image_path']}")
+
